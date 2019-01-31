@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup as bs4
 from urllib.parse import urlsplit
 from io import open as iopen
 import configparser
-import logging
+
 
 config = configparser.ConfigParser()
 config_file = "wp.conf"
@@ -31,7 +31,7 @@ def grab_list_of_curated_urls(url):
         for url in hrefs:
             if len(url) == 43:
                 curated_list.append(url)
-        logging.info("curated list" + str(curated_list))
+
         direct_url = []
         for url in curated_list:
             grab_content = requests.get(url).content
