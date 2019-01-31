@@ -3,9 +3,8 @@
 Automatically downloads wall papers from https://alpha.wallhaven.cc/
 ![](https://media.giphy.com/media/xVu6vxIZzjeJ1aMRhl/giphy.gif)
 ## Requirements
-
-Python3.7 
-Ubuntu 18.04
+- Python3.7 
+- Gnome Desktop Manager on Ubuntu 18.04
 
 ## Installation
 

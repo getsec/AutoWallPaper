@@ -4,6 +4,7 @@ import requests
 from lxml import html
 from bs4 import BeautifulSoup as bs4
 from urllib.parse import urlsplit
+from sys import exit
 from io import open as iopen
 import configparser
 
@@ -64,26 +65,72 @@ def requests_image(file_url, DIR):
         return False
 
 
+def total_pages_of_wallpapers(CATEGORY):
+    url = f"https://alpha.wallhaven.cc/search?q={CATEGORY}"
+    html = requests.get(url).content
+    def match_class(target):                                                        
+        def do_match(tag):                                                          
+            classes = tag.get('class', [])                                          
+            return all(c in classes for c in target)                                
+        return do_match                                                             
+
+    soup = bs4(html, 'html.parser')                                                    
+    data = soup.find_all('div', class_ = 'thumbs-container thumb-listing infinite-scroll')
+    pages = data[0].h2.text
+    total_pages = pages.split(' / ')[1]
+
+    return total_pages
 
 
-
-if __name__ in '__main__':
-    downloads = []
-    print("Currently downloading files this takes roughly 20-30 seconds per page")
+def main(CATEGORY, RESOLUTE, PAGES):
+    print("\n\nCurrently downloading files this takes roughly 20-30 seconds per page")
     print("Details below...\n")
     print(f"Category:   {CATEGORY}")
     print(f"Depth:      {str(PAGES)}")
     print(f"Resolution: {RESOLUTE}")
 
+    DOWNLOADS = []
+
     for page in range(1, int(PAGES)):
         url = f"https://alpha.wallhaven.cc/search?q={CATEGORY}&categories=111&purity=100&atleast={RESOLUTE}&sorting=relevance&order=desc&page={str(page)}"
+        
+       
         image_list = grab_list_of_curated_urls(url)
         
         for item in image_list:
             if 'full' in item:
                 url = f'https:{item}'
-                downloads.append(item)
+                DOWNLOADS.append(item)
                 requests_image(url, DIR)
+    
+        print(f"ERROR CODE FROM REQUESTS: {url.status_code}")
+        print(f"ERROR RESPONSE: \n {url.text}")
+    return DOWNLOADS
 
-    print(f"\n\n{str(len(downloads))} downloads")
+   
+
+if __name__ in '__main__':
+
+    TOTAL_PAGES = int(total_pages_of_wallpapers(CATEGORY))
+    TPN = int(TOTAL_PAGES)
+    PN = int(PAGES)
+    if PN > TPN:
+        print(f"Looks like the page number in your config [{PAGES}] is greater than the available pages [{TOTAL_PAGES}]")
+        print(f"Because the programmer is lazy, go put your depth to [{TOTAL_PAGES}] :D")
+        exit()
+
+
+    if PN < TPN:
+        print("Just a little bit of info\n#######################################")
+        print(f"Looks like you are searching {PAGES} out of {TOTAL_PAGES} total pages")
+        print(f"If you want more wallpapers just update your config depth to: {TOTAL_PAGES}")
+
+        main(CATEGORY, RESOLUTE, PAGES)
+
+    if PN == TPN:
+        main(CATEGORY, RESOLUTE, PAGES)
+
+
+
+    
       
