@@ -6,7 +6,7 @@ import configparser
 
 
 config = configparser.ConfigParser()
-config_file = "wp.conf"
+config_file = "/home/cloud/.personal/AutoWallPaper/wp.conf"
 config.read(config_file)
 
 DIR = config.get('config', 'directory')
