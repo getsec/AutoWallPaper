@@ -1,7 +1,7 @@
 # Auto WallPaper
 
 Automatically downloads wall papers from https://alpha.wallhaven.cc/
-
+![Alt Text](https://i.imgur.com/8o2jGMp.gif)
 ## Requirements
 
 Python3.7 
