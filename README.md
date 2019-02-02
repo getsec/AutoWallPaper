@@ -41,7 +41,7 @@ python3 wallpaper_shuffle.py
 ```
 
 ## Roadmap
-Add the NSFW Tag to make sure you dont download any boobies...
+Add the NSFW Tag to make sure you dont download any boobies... :heavy_check_mark:
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
