@@ -10,11 +10,11 @@ Automatically downloads wall papers from https://alpha.wallhaven.cc/
 
 Use the package manager [pip](https://pip.pypa.io/en/stable/) to install the following packages.
 - configparser
-- BeautifulSoup
+- bs4
 - requests
 
 ```bash
-pip install configparser BeautifulSoup requests --user
+pip install configparser bs4 requests --user
 ```
 
 ## Usage
