@@ -1,5 +1,3 @@
-
-
 import requests
 from lxml import html
 from bs4 import BeautifulSoup as bs4
@@ -8,16 +6,31 @@ from sys import exit
 from io import open as iopen
 import configparser
 
-
+# setting up the config parser
 config = configparser.ConfigParser()
 config_file = "wp.conf"
 config.read(config_file)
 
+# grabbing the config items from the file and creating local variables
+# these will be used in the functions to download wallpapers
 DIR      = config.get('config', 'directory')
 PAGES    = config.get('config', 'depth')
 CATEGORY = config.get('config', 'category')
 RESOLUTE = config.get('config', 'resolution')
+PURITY   = config.get('config', 'nsfw')
 
+# nsfw mapping to wallhaven purity code
+# 100 = SFW
+# 111 = NSFW
+# 110 = Sketchy...?
+if PURITY.lower() == 'no':
+    PCODE = '100'
+if PURITY.lower() == 'yes':
+    PCODE = '111'
+
+
+# First we need to grab a list of all the image sources
+# this function uses the search term and grabs all the hrefs that match to the images
 def grab_list_of_curated_urls(url):
     headers = {
       "User-Agent": "Mozilla/532.0 (Windows NT x.y; rv:10.0) Gecko/20100101 Firefox/10.0"
@@ -50,7 +63,7 @@ def grab_list_of_curated_urls(url):
         
         return False
         
-
+# this function will grab every url and download them to the directory in the config
 def requests_image(file_url, DIR):
     suffix_list = ['jpg', 'png']
     file_name = urlsplit(file_url)[2].split('/')[-1]
@@ -64,7 +77,9 @@ def requests_image(file_url, DIR):
     else:
         return False
 
-
+# this is a nice little function that gets the total number of pages for the category
+# we will use this to ask the user if they want extra wallapers or if they go over
+# the number of total wallpapers
 def total_pages_of_wallpapers(CATEGORY):
     url = f"https://alpha.wallhaven.cc/search?q={CATEGORY}"
     html = requests.get(url).content
@@ -81,8 +96,8 @@ def total_pages_of_wallpapers(CATEGORY):
 
     return total_pages
 
-
-def main(CATEGORY, RESOLUTE, PAGES):
+# the main function which completes the program
+def main(CATEGORY, RESOLUTE, PAGES, PCODE):
     print("\n\nCurrently downloading files this takes roughly 20-30 seconds per page")
     print("Details below...\n")
     print(f"Category:   {CATEGORY}")
@@ -92,7 +107,7 @@ def main(CATEGORY, RESOLUTE, PAGES):
     DOWNLOADS = []
 
     for page in range(1, int(PAGES)):
-        url = f"https://alpha.wallhaven.cc/search?q={CATEGORY}&categories=111&purity=100&atleast={RESOLUTE}&sorting=relevance&order=desc&page={str(page)}"
+        url = f"https://alpha.wallhaven.cc/search?q={CATEGORY}&categories=111&purity={PCODE}&atleast={RESOLUTE}&sorting=relevance&order=desc&page={str(page)}"
         
        
         image_list = grab_list_of_curated_urls(url)
@@ -108,7 +123,9 @@ def main(CATEGORY, RESOLUTE, PAGES):
     return DOWNLOADS
 
    
-
+# I just do this cause you are supposed to,
+# I'm pretty sure this means you can only call the scrip from the command line
+# ie; not as a pythong module
 if __name__ in '__main__':
 
     TOTAL_PAGES = int(total_pages_of_wallpapers(CATEGORY))
@@ -125,10 +142,10 @@ if __name__ in '__main__':
         print(f"Looks like you are searching {PAGES} out of {TOTAL_PAGES} total pages")
         print(f"If you want more wallpapers just update your config depth to: {TOTAL_PAGES}")
 
-        main(CATEGORY, RESOLUTE, PAGES)
+        main(CATEGORY, RESOLUTE, PAGES, PCODE)
 
     if PN == TPN:
-        main(CATEGORY, RESOLUTE, PAGES)
+        main(CATEGORY, RESOLUTE, PAGES, PCODE)
 
 
 
